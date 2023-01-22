@@ -3,47 +3,47 @@
 
 #include <iostream>
 #include <SDL.h>
+#include <math.h>
+#include "Screen.h"
 using namespace std;
+using namespace vekkula;
 
 int WinMain()
 {
-	const int SCREEN_WIDTH = 800;
-	const int SCREEN_HEIGHT = 600;
-	cout << "Program launching (hopefully) " << endl;
+	Screen screen;
 
-	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-		cout << "SDL init failed!" << endl;
-		return 1;
+	if (screen.init() == false) {
+		cout << "Error initialising SDL." << endl;
 	}
 
-	SDL_Window* window = SDL_CreateWindow("Particle Fire Explosion",
-		SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-		SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-
-	if (window == NULL) {
-		SDL_Quit();
-		return 2;
-	}
-
-	bool quit = false;
-
-	SDL_Event event;
-
-	while (!quit) {
+	while (true) {
 		// Update particles
-		// Draw particles
-		// Check for messages/events
 
-		while (SDL_PollEvent(&event)) {
-			if (event.type == SDL_QUIT) {
-				quit = true;
+		// Draw particles
+		int elapsed = SDL_GetTicks();
+		unsigned char green = (unsigned char)((1 + sin(elapsed * 0.0001)) * 128);
+		unsigned char red = (unsigned char)((1 + sin(elapsed * 0.0002)) * 128);
+		unsigned char blue = (unsigned char)((1 + cos(elapsed * 0.0003)) * 128);
+
+
+		for (int y = 0; y < Screen::SCREEN_HEIGHT; y++) {
+			for (int x = 0; x < Screen::SCREEN_WIDTH; x++) {
+				screen.setPixel(x, y, red, green, blue);
 			}
+		}
+
+		screen.setPixel(400, 300, 255, 255, 255);
+
+		// Draw the screen
+		screen.update();
+
+		// Check for messages/events
+		if (screen.processEvents() == false) {
+			break;
 		}
 	}
 
-
-	SDL_DestroyWindow(window);
-	SDL_Quit();
+	screen.close();
 
 	return 0;
 }
