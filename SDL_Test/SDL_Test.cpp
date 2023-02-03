@@ -1,5 +1,6 @@
 // SDL_Test.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
+#define SDL_MAIN_HANDLED
 
 #include <iostream>
 #include <SDL.h>
@@ -12,7 +13,10 @@
 using namespace std;
 using namespace vekkula;
 
-int WinMain() {
+int main(int argc, char* argv[]) {
+
+	// Required to make a console application instead of Windows-application with SDL
+	SDL_SetMainReady();
 
 	srand(time(NULL));
 
@@ -26,7 +30,7 @@ int WinMain() {
 
 	while (true) {
 		// Update particles
-	 
+
 		// Draw particles
 
 		int elapsed = SDL_GetTicks();
@@ -34,7 +38,7 @@ int WinMain() {
 		//screen.clear();
 		swarm.update(elapsed);
 
-		// make a functions
+		// TODO make a functions
 		unsigned char green = (unsigned char)((1 + sin(elapsed * 0.0001)) * 128);
 		unsigned char red = (unsigned char)((1 + sin(elapsed * 0.0002)) * 128);
 		unsigned char blue = (unsigned char)((1 + cos(elapsed * 0.0003)) * 128);
