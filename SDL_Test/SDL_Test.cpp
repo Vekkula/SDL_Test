@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include "Swarm.h"
+#include "SDL_Test.h"
 using namespace std;
 using namespace vekkula;
 
@@ -30,9 +31,10 @@ int WinMain() {
 
 		int elapsed = SDL_GetTicks();
 
-		screen.clear();
+		//screen.clear();
 		swarm.update(elapsed);
 
+		// make a functions
 		unsigned char green = (unsigned char)((1 + sin(elapsed * 0.0001)) * 128);
 		unsigned char red = (unsigned char)((1 + sin(elapsed * 0.0002)) * 128);
 		unsigned char blue = (unsigned char)((1 + cos(elapsed * 0.0003)) * 128);
@@ -48,6 +50,8 @@ int WinMain() {
 
 			screen.setPixel(x, y, green, red, blue);
 		}
+
+		screen.boxBlur();
 
 		// Draw the screen
 		screen.update();
