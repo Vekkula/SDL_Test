@@ -1,49 +1,72 @@
 // SDL_Test.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
+#define SDL_MAIN_HANDLED
 
 #include <iostream>
 #include <SDL.h>
+#include <math.h>
+#include "Screen.h"
+#include <stdlib.h>
+#include <time.h>
+#include "Swarm.h"
+#include "SDL_Test.h"
 using namespace std;
+using namespace vekkula;
 
-int WinMain()
-{
-	const int SCREEN_WIDTH = 800;
-	const int SCREEN_HEIGHT = 600;
-	cout << "Program launching (hopefully) " << endl;
+int main(int argc, char* argv[]) {
 
-	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-		cout << "SDL init failed!" << endl;
-		return 1;
+	// Required to make a console application instead of Windows-application with SDL
+	SDL_SetMainReady();
+
+	srand(time(NULL));
+
+	Screen screen;
+
+	if (screen.init() == false) {
+		cout << "Error initialising SDL." << endl;
 	}
 
-	SDL_Window* window = SDL_CreateWindow("Particle Fire Explosion",
-		SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-		SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+	Swarm swarm;
 
-	if (window == NULL) {
-		SDL_Quit();
-		return 2;
-	}
-
-	bool quit = false;
-
-	SDL_Event event;
-
-	while (!quit) {
+	while (true) {
 		// Update particles
-		// Draw particles
-		// Check for messages/events
 
-		while (SDL_PollEvent(&event)) {
-			if (event.type == SDL_QUIT) {
-				quit = true;
-			}
+		// Draw particles
+
+		int elapsed = SDL_GetTicks();
+
+		//screen.clear();
+		swarm.update(elapsed);
+
+		// TODO make a functions
+		unsigned char green = (unsigned char)((1 + sin(elapsed * 0.0001)) * 128);
+		unsigned char red = (unsigned char)((1 + sin(elapsed * 0.0002)) * 128);
+		unsigned char blue = (unsigned char)((1 + cos(elapsed * 0.0003)) * 128);
+
+		const Particle* const pParticles = swarm.getParticles();
+
+		for (int i = 0; i < Swarm::NPARTICLES; i++) {
+			Particle particle = pParticles[i];
+
+			// calculate screen center ouside while-loop
+			int x = (particle.m_x + 1) * Screen::SCREEN_WIDTH / 2;
+			int y = particle.m_y * Screen::SCREEN_WIDTH / 2 + Screen::SCREEN_HEIGHT / 2;
+
+			screen.setPixel(x, y, green, red, blue);
+		}
+
+		screen.boxBlur();
+
+		// Draw the screen
+		screen.update();
+
+		// Check for messages/events
+		if (screen.processEvents() == false) {
+			break;
 		}
 	}
 
-
-	SDL_DestroyWindow(window);
-	SDL_Quit();
+	screen.close();
 
 	return 0;
 }
